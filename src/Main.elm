@@ -1,14 +1,24 @@
 module Main exposing (main, myElement, myRowOfStuff)
 
-import Element exposing (Element, alignRight, centerY, el, fill, padding, rgb255, row, spacing, text, width)
+import Data exposing (suggestionList)
+import Element exposing (Element, alignRight, centerY, column, el, fill, padding, rgb255, row, spacing, text, width)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
+import SuggestionList exposing (renderSuggestionList)
 
 
 main =
     Element.layout []
-        myRowOfStuff
+        page
+
+
+page : Element msg
+page =
+    column [ width fill ]
+        [ myRowOfStuff
+        , renderSuggestionList suggestionList
+        ]
 
 
 myRowOfStuff : Element msg
