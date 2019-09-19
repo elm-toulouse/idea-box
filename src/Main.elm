@@ -1,15 +1,25 @@
 module Main exposing (main, myElement, myRowOfStuff)
 
 import Browser
-import Element exposing (Element, alignRight, centerY, el, fill, height, padding, paddingXY, rgb255, row, spacing, text, width)
+import Data exposing (suggestionList)
+import Element exposing (Element, alignRight, centerY, column, el, fill, height, padding, paddingXY, rgb255, row, spacing, text, width)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
+import SuggestionList exposing (renderSuggestionList)
 
 
 main =
     Browser.sandbox { init = init, update = update, view = view }
+
+
+page : String -> Element Msg
+page searchField =
+    column [ width fill ]
+        [ myRowOfStuff searchField
+        , renderSuggestionList suggestionList
+        ]
 
 
 update : Msg -> Model -> Model
@@ -25,7 +35,7 @@ update msg model =
 view { searchField } =
     Element.layoutWith { options = [ Element.focusStyle noFocusStyle ] }
         []
-        (myRowOfStuff searchField)
+        (page searchField)
 
 
 type alias Model =
