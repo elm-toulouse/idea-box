@@ -20,13 +20,13 @@ jobs:
     - stage: Build 🔨
       name: elm-format
       script:
-      - FORMAT=$(elm-format --validate src/ tests/)
+      - FORMAT=$(elm-format --validate src/)
       - test "$FORMAT" = "[]" || (echo $FORMAT && exit 1)
 
     - stage: Build 🔨
       name: elm-make
       script:
-      - elm make --optimize
+      - elm make --optimize src/Main.elm
 
 #   - stage: Test ☂️
 #     name: elm-coverage
