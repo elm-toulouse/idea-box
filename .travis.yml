@@ -1,0 +1,36 @@
+sudo: false
+
+language: elm
+elm:
+  - latest-0.19.1
+elm_test: 0.19.1
+elm_format: 0.8.2
+
+git:
+  depth: false
+
+if: branch = master
+
+stages:
+- Build 🔨
+# - Test ☂️
+
+jobs:
+  include:
+    - stage: Build 🔨
+      name: elm-format
+      script:
+      - FORMAT=$(elm-format --validate src/ tests/)
+      - test "$FORMAT" = "[]" || (echo $FORMAT && exit 1)
+
+    - stage: Build 🔨
+      name: elm-make
+      script:
+      - elm make --optimize
+
+#   - stage: Test ☂️
+#     name: elm-coverage
+#     script:
+#     - npm install -g elm-coverage codecov
+#     - elm-coverage -r codecov
+#     - codecov -f .coverage/codecov.json
