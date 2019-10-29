@@ -7,6 +7,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
+import Search exposing (filterSortSuggestions)
 import SuggestionList exposing (renderSuggestionList)
 
 
@@ -18,7 +19,7 @@ page : String -> Element Msg
 page searchField =
     column [ width fill ]
         [ myRowOfStuff searchField
-        , renderSuggestionList suggestionList
+        , renderSuggestionList (filterSortSuggestions 100 searchField suggestionList)
         ]
 
 
