@@ -1,25 +1,25 @@
 module Main exposing (main, myElement, myRowOfStuff)
 
 import Browser
-import Data exposing (suggestionList)
-import Element exposing (Element, alignRight, centerY, column, el, fill, height, padding, paddingXY, rgb255, row, spacing, text, width)
+import Data exposing (Suggestion, suggestionList)
+import Element exposing (Element, alignRight, centerY, column, el, fill, height, padding, paddingXY, px, rgb255, row, spacing, text, width)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
-import Element.Input as Input
+import Element.Input as Input exposing (button)
+import Html exposing (Html)
 import Search exposing (filterSortSuggestions)
-import SuggestionList exposing (renderSuggestionList)
 
 
 main =
     Browser.sandbox { init = init, update = update, view = view }
 
 
-page : String -> Element Msg
-page searchField =
+page : Model -> Element Msg
+page model =
     column [ width fill ]
-        [ myRowOfStuff searchField
-        , renderSuggestionList (filterSortSuggestions 100 searchField suggestionList)
+        [ myRowOfStuff model.searchField
+        , renderSuggestionList (filterSortSuggestions 100 model.searchField model.suggestionList)
         ]
 
 
@@ -32,26 +32,34 @@ update msg model =
         SearchPressed ->
             model
 
+        UpvotePressed suggestion ->
+            { model | suggestionList = List.append model.suggestionList [ suggestion ] }
 
-view { searchField } =
+
+view : Model -> Html.Html Msg
+view model =
     Element.layoutWith { options = [ Element.focusStyle noFocusStyle ] }
         []
-        (page searchField)
+        (page model)
 
 
 type alias Model =
     { searchField : String
+    , suggestionList : List Data.Suggestion
     }
 
 
+init : Model
 init =
     { searchField = ""
+    , suggestionList = suggestionList
     }
 
 
 type Msg
     = SearchChanged String
     | SearchPressed
+    | UpvotePressed Data.Suggestion
 
 
 noFocusStyle : Element.FocusStyle
@@ -96,3 +104,25 @@ myElement =
         , padding 10
         ]
         (text "stylish!")
+
+
+renderSuggestionList : List Suggestion -> Element Msg
+renderSuggestionList suggestions =
+    column [ width fill, padding 15, spacing 15 ]
+        (List.map renderSuggestion suggestions)
+
+
+renderSuggestion : Suggestion -> Element Msg
+renderSuggestion suggestion =
+    row [ width fill ]
+        [ button []
+            { onPress = Just (UpvotePressed suggestion)
+            , label = text "Upvote"
+            }
+        , el [ Font.center, width (px 50) ] (suggestion.votes |> String.fromInt |> text)
+        , column [ width fill ]
+            [ el [ Font.size 28 ] (text suggestion.title)
+            , el [ Font.size 20 ] (text suggestion.description)
+            , el [ Font.alignRight, width fill ] (text suggestion.author)
+            ]
+        ]
