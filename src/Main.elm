@@ -2,6 +2,7 @@ module Main exposing (main, myElement, myRowOfStuff)
 
 import Browser
 import Data exposing (Suggestion, suggestionList)
+import Dict exposing (Dict)
 import Element exposing (Element, alignRight, centerY, column, el, fill, height, padding, paddingXY, px, rgb255, row, spacing, text, width)
 import Element.Background as Background
 import Element.Border as Border
@@ -19,7 +20,7 @@ page : Model -> Element Msg
 page model =
     column [ width fill ]
         [ myRowOfStuff model.searchField
-        , renderSuggestionList (filterSortSuggestions 100 model.searchField model.suggestionList)
+        , renderSuggestionList (filterSortSuggestions 100 model.searchField (Dict.values model.suggestionList))
         ]
 
 
@@ -33,7 +34,17 @@ update msg model =
             model
 
         UpvotePressed suggestion ->
-            { model | suggestionList = List.append model.suggestionList [ suggestion ] }
+            { model | suggestionList = Dict.update suggestion.title upvote model.suggestionList }
+
+
+upvote : Maybe Suggestion -> Maybe Suggestion
+upvote maybeSugg =
+    case maybeSugg of
+        Just suggestion ->
+            Just { suggestion | votes = suggestion.votes + 1 }
+
+        Nothing ->
+            Nothing
 
 
 view : Model -> Html.Html Msg
@@ -45,14 +56,14 @@ view model =
 
 type alias Model =
     { searchField : String
-    , suggestionList : List Data.Suggestion
+    , suggestionList : Dict String Data.Suggestion
     }
 
 
 init : Model
 init =
     { searchField = ""
-    , suggestionList = suggestionList
+    , suggestionList = Dict.fromList (List.map (\elem -> ( elem.title, elem )) suggestionList)
     }
 
 
